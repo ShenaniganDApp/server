@@ -1,32 +1,30 @@
-const User = require('../UserModel');
-const { GraphQLString, GraphQLNonNull, GraphQLID } = require('graphql');
+import User from '../UserModel';
+import { GraphQLString, GraphQLNonNull, GraphQLID } from 'graphql';
 
-import { connectionArgs, connectionFromArray } from 'graphql-relay';
-
-import { transformUser } from '../../../merge';
+import { connectionArgs, fromGlobalId } from 'graphql-relay';
 
 import UserType, { UserConnection } from '../UserType';
 
-export = {
+import * as UserLoader from '../UserLoader';
+
+export default {
   me: {
     type: UserType,
-    resolve: (root, args, context) =>
-      context.user ? User.findOne({ _id: context.user._id }) : null
+    resolve: (root, args, context) => {
+      console.log('context: ', context.user);
+      context.user ? UserLoader.load(context, context.user._id) : null;
+    }
   },
   user: {
     type: UserType,
     args: {
       _id: {
-        type: new GraphQLNonNull(GraphQLID)
+        type: new GraphQLNonNull(GraphQLString)
       }
     },
-    resolve: async (obj, args, context) => {
-      if (!args._id) {
-        throw new Error('User does not exist');
-      }
-
-      user = await User.findOne({ _id: args._id });
-      return transformUser(user);
+    resolve: (obj, args, context) => {
+      // const { id } = fromGlobalId(args.id);
+      return UserLoader.load(context, args._id);
     }
   },
   users: {
@@ -37,18 +35,6 @@ export = {
         type: GraphQLString
       }
     },
-    resolve: async (obj, args, context) => {
-      const where = args.search
-        ? { name: { $regex: new RegExp(`^${args.search}`, 'ig') } }
-        : {};
-      const users = await User.find(where, {});
-      users.map(user => {
-        return transformUser(user);
-      });
-      result = connectionFromArray(users, args);
-      result.totalCount = users.length;
-      result.count = result.edges.length;
-      return result;
-    }
+    resolve: (obj, args, context) => UserLoader.loadUsers(context, args)
   }
 };

@@ -6,7 +6,7 @@ import WagerQueries from '../../modules/wager/queries/wagers';
 
 import { nodeField } from '../../nodeInterface';
 
-export = new GraphQLObjectType({
+export default new GraphQLObjectType({
   name: 'Query',
   description: 'The root of all... queries',
   fields: () => ({

@@ -1,9 +1,9 @@
-const Wager = require('../WagerModel');
+import WagerModel from '../WagerModel';
 
-const { mutationWithClientMutationId } = require('graphql-relay');
-const { GraphQLString, GraphQLList, GraphQLNonNull } = require('graphql');
+import { mutationWithClientMutationId } from 'graphql-relay';
+import { GraphQLString, GraphQLList, GraphQLNonNull } from 'graphql';
 
-module.exports = mutationWithClientMutationId({
+export default mutationWithClientMutationId({
   name: 'AddOptions',
   inputFields: {
     options: {
@@ -17,13 +17,13 @@ module.exports = mutationWithClientMutationId({
     if (!req.isAuth) {
       throw new Error('Unauthenticated');
     }
-    const wager = await Wager.findById(wagerId);
+    const wager = await WagerModel.findById(wagerId);
     if (!wager) {
       throw new Error('Wager not found.');
     }
 
     const addedOptions = await wager.options.concat(options);
-    if (addedOptions < 2) {
+    if (addedOptions.length < 2) {
       throw new Error('Wager must have at least two options.');
     }
     wager.options = addedOptions;

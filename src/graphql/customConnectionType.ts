@@ -1,4 +1,4 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLNonNull,
   GraphQLList,
@@ -7,13 +7,10 @@ const {
   GraphQLInt,
   GraphQLFieldConfigArgumentMap,
   Thunk
-} = require('graphql');
-const {
-  ConnectionConfig,
-  GraphQLConnectionDefinitions
-} = require('graphql-relay');
+} from 'graphql';
+import { ConnectionConfig, GraphQLConnectionDefinitions } from 'graphql-relay';
 
-const forwardConnectionArgs = {
+export const forwardConnectionArgs: GraphQLFieldConfigArgumentMap = {
   after: {
     type: GraphQLString
   },
@@ -22,7 +19,7 @@ const forwardConnectionArgs = {
   }
 };
 
-const backwardConnectionArgs = {
+export const backwardConnectionArgs: GraphQLFieldConfigArgumentMap = {
   before: {
     type: GraphQLString
   },
@@ -31,7 +28,7 @@ const backwardConnectionArgs = {
   }
 };
 
-const connectionArgs = {
+export const connectionArgs = {
   ...forwardConnectionArgs,
   ...backwardConnectionArgs
 };
@@ -58,13 +55,15 @@ const pageInfoType = new GraphQLObjectType({
     }
   })
 });
-
-function resolveMaybeThunk(thingOrThunk) {
+// @ts-ignore
+function resolveMaybeThunk(thingOrThunk: Thunk<T>): T {
   return typeof thingOrThunk === 'function' ? thingOrThunk() : thingOrThunk;
 }
 
-function connectionDefinitions(config) {
+export function connectionDefinitions(config: ConnectionConfig): GraphQLConnectionDefinitions {
   const { nodeType, resolveCursor, resolveNode } = config;
+  // this has the correct properties inside ConnectionConfigNodeTypeNullable
+  // @ts-ignore
   const name = config.name || nodeType.name;
   const edgeFields = config.edgeFields || {};
   const connectionFields = config.connectionFields || {};
@@ -83,7 +82,7 @@ function connectionDefinitions(config) {
         resolve: resolveCursor,
         description: 'A cursor for use in pagination'
       },
-      ...resolveMaybeThunk(edgeFields)
+      ...(resolveMaybeThunk(edgeFields) as any)
     })
   });
 
@@ -93,7 +92,7 @@ function connectionDefinitions(config) {
     fields: () => ({
       count: {
         type: GraphQLNonNull(GraphQLInt),
-        description: 'Number of items in this connection',
+        description: 'Number of items in this connection'
         // resolve: connection => connection.count,
       },
       totalCount: {
@@ -120,16 +119,9 @@ function connectionDefinitions(config) {
         type: GraphQLNonNull(GraphQLList(edgeType)),
         description: 'A list of edges.'
       },
-      ...resolveMaybeThunk(connectionFields)
+      ...(resolveMaybeThunk(connectionFields) as any)
     })
   });
 
   return { edgeType, connectionType };
 }
-
-module.exports = {
-  connectionArgs,
-  connectionDefinitions,
-  backwardConnectionArgs,
-  forwardConnectionArgs
-};

@@ -1,12 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+import express from 'express';
+import bodyParser from 'body-parser';
+import graphqlHttp from 'express-graphql';
+// import { execute, subscribe } from 'graphql');
+import mongoose from 'mongoose';
+import {schema as graphqlSchema} from './graphql/schema/index';
+import isAuth from './middleware/is-auth';
+// import { SubscriptionServer } from 'subscriptions-transport-ws');
 const app = express();
-const graphqlHttp = require('express-graphql');
-// const { execute, subscribe } = require('graphql');
-const mongoose = require('mongoose');
-const graphqlSchema = require('./graphql/schema/index');
-const isAuth = require('./middleware/is-auth');
-// const { SubscriptionServer } = require('subscriptions-transport-ws');
 
 app.use(bodyParser.json());
 
@@ -77,6 +77,6 @@ mongoose
     console.log('Connection Failed');
   });
 
-module.exports = app;
+export default app;
 
   

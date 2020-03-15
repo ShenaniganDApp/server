@@ -1,21 +1,12 @@
-const Wager = require('../WagerModel');
-const User = require('../../user/UserModel');
+import WagerModel from '../WagerModel';
+import UserModel from '../../user/UserModel';
 
-const { transformWager } = require('../../../merge');
-// const { pubSub, EVENTS } = require('../../pubSub');
+// import { pubSub, EVENTS } from ../../pubSub');
 
-const {
-  mutationWithClientMutationId,
-  globalIdField
-} = require('graphql-relay');
-const {
-  GraphQLString,
-  GraphQLNonNull,
-  GraphQLList,
-  GraphQLID
-} = require('graphql');
+import { mutationWithClientMutationId } from 'graphql-relay';
+import { GraphQLString, GraphQLNonNull, GraphQLList } from 'graphql';
 
-module.exports = mutationWithClientMutationId({
+export default mutationWithClientMutationId({
   name: 'CreateWager',
   inputFields: {
     title: {
@@ -29,32 +20,31 @@ module.exports = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ title, content, options }, req) => {
+    console.log(req.user)
     if (!req.isAuth) {
       throw new Error('Unauthenticated');
     }
     if (options.length < 2) {
-      throw new Error('Wager must have at least two options.');
+      throw new Error('WagerModel must have at least two options.');
     }
     const creatorId = req.user._id;
-    const wager = new Wager({
+    const wager = new WagerModel({
       title,
       content,
       options,
       creator: creatorId,
-      live:false
+      live: false
     });
-    let createdWager;
     try {
-      const result = await wager.save();
-      createdWager = transformWager(result);
-      const creator = await User.findById(creatorId);
+      await wager.save();
+      const creator = await UserModel.findById(creatorId);
       if (!creator) {
         throw new Error('User not found.');
       }
-      creator.createdWagers.push(wager);
+      creator.createdWagers.push(wager._id);
       await creator.save();
       // await pubSub.publish(EVENTS.POLL.ADDED, { WagerAdded: { wager } });
-      return createdWager;
+      return wager;
     } catch (err) {
       console.log(err);
       throw err;

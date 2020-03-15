@@ -1,21 +1,17 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLNonNull,
   GraphQLID
-} = require('graphql');
-const {
-  globalIdField,
-  connectionArgs,
-  connectionFromArray
-} = require('graphql-relay');
+} from 'graphql';
+import { globalIdField, connectionArgs } from 'graphql-relay';
 
-const Wager = require('./UserModel');
-// const Bet = require('../../models/bet');
-const { transformWager } = require('../../merge');
+// import Bet from '../../models/bet');
+import { WagerLoader } from '../../loaders';
+import { WagerConnection } from '../wager/WagerType';
 
-const { connectionDefinitions } = require('../../CustomConnectionType');
-const { registerType, nodeInterface } = require('../../nodeInterface');
+import { connectionDefinitions } from '../../customConnectionType';
+import { registerType, nodeInterface } from '../../nodeInterface';
 
 const UserType = registerType(
   new GraphQLObjectType({
@@ -53,30 +49,19 @@ const UserType = registerType(
       //       return result;
       //     }
       //   },
-        createdWagers: {
-          type: require('../wager/wagerType').WagerConnection.connectionType,
-          args: { ...connectionArgs },
-          resolve: async (user, args) => {
-            const wagers = await Wager.find({ creator: user._id });
-            wagers.map(wager => {
-              return transformWager(wager);
-            });
-            result = connectionFromArray(wagers, args);
-            result.totalCount = wagers.length;
-            result.count = result.edges.length;
-            return result;
-          }
-        }
+      createdWagers: {
+        type: WagerConnection.connectionType,
+        args: { ...connectionArgs },
+        resolve: (user, args, context) =>
+          WagerLoader.loadUserWagers(user, context, args)
+      }
     }),
     interfaces: () => [nodeInterface]
   })
 );
-const UserConnection = connectionDefinitions({
+export const UserConnection = connectionDefinitions({
   name: 'User',
-  nodeType: GraphQLNonNull(UserType)
+  nodeType: UserType
 });
 
-module.exports = {
-  UserType,
-  UserConnection
-};
+export default UserType;

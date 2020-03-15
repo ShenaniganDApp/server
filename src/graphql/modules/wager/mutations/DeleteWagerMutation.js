@@ -1,9 +1,9 @@
-const Wager = require('../WagerModel');
+import WagerModel from '../WagerModel';
 
-const { mutationWithClientMutationId } = require('graphql-relay');
-const { GraphQLString, GraphQLBoolean, GraphQLNonNull } = require('graphql');
+import { mutationWithClientMutationId } from 'graphql-relay';
+import { GraphQLString, GraphQLBoolean, GraphQLNonNull } from 'graphql';
 
-module.exports = mutationWithClientMutationId({
+export default mutationWithClientMutationId({
   name: 'DeleteWager',
   inputFields: {
     wagerId: {
@@ -17,12 +17,12 @@ module.exports = mutationWithClientMutationId({
     if (!req.isAuth) {
       throw new Error('Unauthenticated');
     }
-    const wager = await Wager.findOne({ _id: wagerId });
+    const wager = await WagerModel.findOne({ _id: wagerId });
     const creatorId = wager.creator._id.toString();
     if (creatorId !== creator) {
       throw new Error('User is not creator');
     }
-    await Wager.deleteOne({ _id: wagerId });
+    await WagerModel.deleteOne({ _id: wagerId });
     console.log('deleted wager with title: ' + wager.title);
   },
 

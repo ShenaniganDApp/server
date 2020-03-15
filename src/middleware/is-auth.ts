@@ -1,7 +1,7 @@
-const User = require('../../graphql/modules/user/UserModel');
-const jwt = require('jsonwebtoken');
+import { UserModel } from '../models';
+import jwt from 'jsonwebtoken';
 
-module.exports = async (req, res, next) => {
+export default async (req, res, next) => {
   const authHeader = req.get('Authorization');
   if (!authHeader) {
     req.isAuth = false;
@@ -25,6 +25,9 @@ module.exports = async (req, res, next) => {
     return next();
   }
   req.isAuth = true;
-  req.user = await User.findOne({ _id: decodedToken.userId });
+
+  req.user = await UserModel.findOne({
+    _id: (decodedToken as { userId: string }).userId
+  });
   next();
 };

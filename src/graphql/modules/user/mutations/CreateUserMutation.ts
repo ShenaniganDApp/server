@@ -1,11 +1,11 @@
-import User from '../UserModel';
+import UserModel from '../UserModel';
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { mutationWithClientMutationId, globalIdField } from 'graphql-relay';
+import { mutationWithClientMutationId } from 'graphql-relay';
 import { GraphQLString, GraphQLNonNull } from 'graphql';
 
-export = mutationWithClientMutationId({
+export default mutationWithClientMutationId({
   name: 'CreateUser',
   inputFields: {
     username: {
@@ -19,14 +19,14 @@ export = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ username, email, password }) => {
-    // const existingAddress = await User.findOne({
+    // const existingAddress = await UserModel.findOne({
     //   addresses: args.userInput.address
     // });
     // if (existingAddress) {
     //   console.log(existingAddress);
-    //   throw new Error('User already exists.');
+    //   throw new Error('UserModel already exists.');
     // }
-    const existingUser = await User.findOne({
+    const existingUser = await UserModel.findOne({
       email: email
     });
     if (existingUser) {
@@ -40,11 +40,11 @@ export = mutationWithClientMutationId({
       //   _id: result.id
       // };
       console.log(existingUser);
-      throw new Error('User already exists.');
+      throw new Error('UserModel already exists.');
     }
     // const nonce = await bcrypt.hash(args.userInput.address, 12);
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = new User({
+    const user = new UserModel({
       username: username,
       email: email,
       password: hashedPassword
@@ -59,7 +59,7 @@ export = mutationWithClientMutationId({
       },
       'somesupersecretkey'
     );
-    // await user.save();
+    await user.save();
     return {
       token: token
     };

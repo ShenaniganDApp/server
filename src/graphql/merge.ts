@@ -1,8 +1,7 @@
-const DataLoader = require('dataloader');
-// const Wager = require('../models/wager');
-const User = require('./modules/user/UserModel');
-// const Comment = require('../models/comment');
-const { dateToString } = require('../helpers/date');
+import DataLoader from 'dataloader';
+// import Comment from '../models/comment');
+import dateToString from '../helpers/date';
+import { WagerModel, UserModel } from '../models';
 
 //////////////////////////////////////////////////////////
 ///      Reference Data Functions                      ///
@@ -12,16 +11,17 @@ const { dateToString } = require('../helpers/date');
 ///         defined in Mongoose model file             ///
 //////////////////////////////////////////////////////////
 
-// const wagerLoader = new DataLoader(wagerIds => {
-//   return wagers(wagerIds);
-// });
+const wagerLoader = new DataLoader(wagerIds => {
+  return wagers(wagerIds);
+});
 
 // const betLoader = new DataLoader(betIds => {
 //   return bets(betIds);
 // });
 
 const userLoader = new DataLoader(userIds => {
-  return User.find({ _id: { $in: userIds } });
+  //@ts-ignore
+  return UserModel.find({ _id: { $in: userIds } });
 });
 
 const user = async userId => {
@@ -35,7 +35,7 @@ const user = async userId => {
 
 const wagers = async wagerIds => {
   try {
-    const wagers = await Wager.find({ _id: { $in: wagerIds } });
+    const wagers = await WagerModel.find({ _id: { $in: wagerIds } });
     return wagers.map(wager => {
       return transformWager(wager);
     });
@@ -99,11 +99,11 @@ const transformWager = wager => {
 };
 
 const transformUser = user => {
-  console.log(user._doc)
+  console.log(user._doc);
   return {
     ...user._doc,
     _id: user.id,
-    createdWagers: () => wagerLoader.loadMany(user._doc.createdWagers),
+    createdWagers: () => wagerLoader.loadMany(user._doc.createdWagers)
     // createdBets: () => betLoader.loadMany(user._doc.createdBets)
   };
 };
@@ -120,5 +120,4 @@ const transformUser = user => {
 //   };
 // };
 
-exports.transformUser = transformUser;
-exports.transformWager = transformWager;
+export { transformUser, transformWager };

@@ -1,6 +1,6 @@
-const app = require('./app');
-const debug = require('debug')('http');
-const http = require('http');
+import app from './app';
+import debug = require('debug');('http');
+import http from 'http';
 
 // const subscriptionServer = require('./subscriptionServer');
 

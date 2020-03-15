@@ -1,26 +1,22 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLBoolean,
   GraphQLList,
   GraphQLNonNull,
   GraphQLID
-} = require('graphql');
-const {
-  globalIdField,
-  connectionArgs,
-  connectionFromArray
-} = require('graphql-relay');
-const User = require('../user/UserModel');
-// const Bet = require('../../models/bet');
-const { connectionDefinitions } = require('../../CustomConnectionType');
-const { registerType, nodeInterface } = require('../../nodeInterface');
-const { transformUser, transformBet } = require('../../merge');
+} from 'graphql';
+import { globalIdField } from 'graphql-relay';
+import { UserLoader } from '../../loaders';
+import UserType from '../user/UserType';
+// import Bet from '../../models/bet');
+import { connectionDefinitions } from '../../customConnectionType';
+import { registerType, nodeInterface } from '../../nodeInterface';
 
 const WagerType = registerType(
   new GraphQLObjectType({
     name: 'Wager',
-    content: 'Wager data',
+    description: 'Wager data',
     fields: () => ({
       id: globalIdField('Wager'),
       _id: {
@@ -40,17 +36,15 @@ const WagerType = registerType(
         resolve: wager => wager.live
       },
       creator: {
-        type: require('../user/userType').UserType,
-        resolve: async wager => {
-          const user = await User.findOne({ _id: wager.creator });
-          console.log(user);
-          return transformUser(user);
+        type: UserType,
+        resolve: (wager, args, context) => {
+          return UserLoader.loadCreator(wager, context, args);
         }
       },
       options: {
         type: GraphQLList(GraphQLString),
         resolve: wager => wager.options
-      },
+      }
       // bets: {
       //   type: require('../bet/betType').BetConnection.connectionType,
       //   args: { ...connectionArgs },
@@ -64,26 +58,15 @@ const WagerType = registerType(
       //     result.count = result.edges.length;
       //     return result;
       //   }
-      // },
-      createdAt: {
-        type: GraphQLNonNull(GraphQLString),
-        resolve: wager => wager.createdAt
-      },
-      updatedAt: {
-        type: GraphQLNonNull(GraphQLString),
-        resolve: wager => wager.updatedAt
-      }
+      // }
     }),
     interfaces: () => [nodeInterface]
   })
 );
 
-const WagerConnection = connectionDefinitions({
-  name: 'Wager',
-  nodeType: GraphQLNonNull(WagerType)
-});
+export default WagerType;
 
-module.exports = {
-  WagerType,
-  WagerConnection
-};
+export const WagerConnection = connectionDefinitions({
+  name: 'Wager',
+  nodeType: WagerType
+});

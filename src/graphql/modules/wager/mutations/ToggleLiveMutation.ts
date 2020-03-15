@@ -1,9 +1,9 @@
-const Wager = require('../WagerModel');
+import WagerModel from '../WagerModel';
 
-const { mutationWithClientMutationId } = require('graphql-relay');
-const { GraphQLString, GraphQLBoolean, GraphQLNonNull } = require('graphql');
+import { mutationWithClientMutationId } from 'graphql-relay';
+import { GraphQLString, GraphQLBoolean, GraphQLNonNull } from 'graphql';
 
-module.exports = mutationWithClientMutationId({
+export default mutationWithClientMutationId({
   name: 'ToggleLive',
   inputFields: {
     wagerId: {
@@ -14,7 +14,7 @@ module.exports = mutationWithClientMutationId({
     if (!req.isAuth) {
       throw new Error('Unauthenticated');
     }
-    const wager = await Wager.findOne({ _id: wagerId });
+    const wager = await WagerModel.findOne({ _id: wagerId });
     console.log(wager);
     if (wager.live) {
       wager.live = false;
@@ -22,7 +22,7 @@ module.exports = mutationWithClientMutationId({
       return { live: result.live };
     }
     if (wager.options.length < 2) {
-      throw new Error('Wager must have at least two options.');
+      throw new Error('WagerModel must have at least two options.');
     }
     wager.live = true;
     const result = await wager.save();

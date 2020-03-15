@@ -4,10 +4,8 @@ import QueryType from './type/QueryType';
 import MutationType from './type/MutationType';
 import SubscriptionType from './type/SubscriptionType';
 
-const schema = new GraphQLSchema({
+export const schema = new GraphQLSchema({
   query: QueryType,
   mutation: MutationType
   // subscription: SubscriptionType
 });
-
-export = schema;

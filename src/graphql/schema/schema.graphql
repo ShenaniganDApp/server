@@ -31,7 +31,7 @@ input CreateWagerInput {
 }
 
 type CreateWagerPayload {
-  _id: ID!
+  _id: String!
   title: String
   content: String
   options: [String]
@@ -112,9 +112,9 @@ type Query {
     id: ID!
   ): Node
   me: User
-  user(_id: ID!): User
+  user(id: ID!): User
   users(after: String, first: Int, before: String, last: Int, search: String): UserConnection
-  wager(_id: ID!): Wager
+  wager(id: ID!): Wager
   wagers(after: String, first: Int, before: String, last: Int, search: String): WagerConnection
 }
 
@@ -169,12 +169,13 @@ type UserConnection {
 """An edge in a connection."""
 type UserEdge {
   """The item at the end of the edge"""
-  node: User!
+  node: User
 
   """A cursor for use in pagination"""
   cursor: String!
 }
 
+"""Wager data"""
 type Wager implements Node {
   """The ID of an object"""
   id: ID!
@@ -184,8 +185,6 @@ type Wager implements Node {
   live: Boolean
   creator: User
   options: [String]
-  createdAt: String!
-  updatedAt: String!
 }
 
 """A connection to a list of items."""
@@ -217,7 +216,7 @@ type WagerConnection {
 """An edge in a connection."""
 type WagerEdge {
   """The item at the end of the edge"""
-  node: Wager!
+  node: Wager
 
   """A cursor for use in pagination"""
   cursor: String!

@@ -1,11 +1,11 @@
-import User from '../UserModel';
+import UserModel from '../UserModel';
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { mutationWithClientMutationId } from 'graphql-relay';
 import { GraphQLString, GraphQLNonNull } from 'graphql';
 
-export = mutationWithClientMutationId({
+export default mutationWithClientMutationId({
   name: 'Login',
   inputFields: {
     email: {
@@ -16,9 +16,9 @@ export = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ email, password }) => {
-    const user = await User.findOne({ email: email });
+    const user = await UserModel.findOne({ email: email });
     if (!user) {
-      throw new Error('User does not exist');
+      throw new Error('UserModel does not exist');
     }
     const isEqual = await bcrypt.compare(password, user.password);
     if (!isEqual) {

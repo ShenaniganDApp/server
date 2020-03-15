@@ -1,8 +1,8 @@
-import User = require('../UserModel');
+import UserModel from '../UserModel';
 import { mutationWithClientMutationId } from 'graphql-relay';
 import { GraphQLString, GraphQLNonNull } from 'graphql';
 
-export = mutationWithClientMutationId({
+export default mutationWithClientMutationId({
   name: 'Delete',
   inputFields: {
     _id: {
@@ -10,18 +10,18 @@ export = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ _id }) => {
-    const user = await User.findOne({ _id: _id });
+    const user = await UserModel.findOne({ _id: _id });
     if (!user) {
-      throw new Error('User does not exist');
+      throw new Error('UserModel does not exist');
     }
-    User.deleteOne({ _id: _id }, err => {
+    UserModel.deleteOne({ _id: _id }, err => {
       if (err) {
         throw new Error(err.message);
       }
     });
     return {
       userId: user.id,
-      message: `User with username: "${user.username}" was deleted`
+      message: `UserModel with username: "${user.username}" was deleted`
     };
   },
   outputFields: {

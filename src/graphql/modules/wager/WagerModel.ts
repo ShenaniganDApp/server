@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Model, Types } from 'mongoose';
+import { IUser } from '../user/UserModel';
 const Schema = mongoose.Schema;
 
 const wagerSchema = new Schema(
@@ -32,7 +33,17 @@ const wagerSchema = new Schema(
     //   }
     // ]
   },
-  { timestamps: true }
+  { timestamps: true, collection:'wagers' }
 );
 
-module.exports = mongoose.model('Wager', wagerSchema);
+export interface IWager extends Document {
+  title: string;
+  content?: string;
+  live: boolean;
+  options: Array<string>;
+  creator: Types.ObjectId;
+}
+
+const WagerModel: Model<IWager> = mongoose.model('Wager', wagerSchema);
+
+export default WagerModel;
