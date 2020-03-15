@@ -1,8 +1,8 @@
-const User = require('../UserModel');
-const { mutationWithClientMutationId } = require('graphql-relay');
-const { GraphQLString, GraphQLNonNull, GraphQLID } = require('graphql');
+import User = require('../UserModel');
+import { mutationWithClientMutationId } from 'graphql-relay';
+import { GraphQLString, GraphQLNonNull } from 'graphql';
 
-module.exports = mutationWithClientMutationId({
+export = mutationWithClientMutationId({
   name: 'Delete',
   inputFields: {
     _id: {

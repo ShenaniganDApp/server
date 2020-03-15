@@ -1,18 +1,20 @@
 const User = require('../UserModel');
 const { GraphQLString, GraphQLNonNull, GraphQLID } = require('graphql');
 
-const { connectionArgs, connectionFromArray } = require('graphql-relay');
+import { connectionArgs, connectionFromArray } from 'graphql-relay';
 
-const { transformUser } = require('../../../merge');
+import { transformUser } from '../../../merge';
 
-module.exports = {
+import UserType, { UserConnection } from '../UserType';
+
+export = {
   me: {
-    type: require('../../user/userType').UserType,
+    type: UserType,
     resolve: (root, args, context) =>
       context.user ? User.findOne({ _id: context.user._id }) : null
   },
   user: {
-    type: require('../../user/userType').UserType,
+    type: UserType,
     args: {
       _id: {
         type: new GraphQLNonNull(GraphQLID)
@@ -28,7 +30,7 @@ module.exports = {
     }
   },
   users: {
-    type: require('../../user/userType').UserConnection.connectionType,
+    type: UserConnection.connectionType,
     args: {
       ...connectionArgs,
       search: {

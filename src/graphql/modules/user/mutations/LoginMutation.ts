@@ -1,11 +1,11 @@
-const User = require('../UserModel');
+import User from '../UserModel';
 
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { mutationWithClientMutationId } = require('graphql-relay');
-const { GraphQLString, GraphQLNonNull } = require('graphql');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { mutationWithClientMutationId } from 'graphql-relay';
+import { GraphQLString, GraphQLNonNull } from 'graphql';
 
-module.exports = mutationWithClientMutationId({
+export = mutationWithClientMutationId({
   name: 'Login',
   inputFields: {
     email: {

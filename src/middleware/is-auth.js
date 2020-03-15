@@ -1,4 +1,4 @@
-const User = require('../graphql/modules/user/UserModel');
+const User = require('../../graphql/modules/user/UserModel');
 const jwt = require('jsonwebtoken');
 
 module.exports = async (req, res, next) => {

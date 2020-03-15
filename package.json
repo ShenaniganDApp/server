@@ -7,10 +7,12 @@
   "author": "Shenanigan Team",
   "license": "GNU",
   "scripts": {
-    "start:server": "nodemon index.js",
+    "start:server": "nodemon ./src/index.js",
     "get-schema:local": "get-graphql-schema http://localhost:8080/graphql > ./graphql/schema/schema.graphql"
   },
   "dependencies": {
+    "@types/graphql-relay": "^0.4.11",
+    "@types/node": "^13.9.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "dataloader": "^2.0.0",
@@ -21,6 +23,9 @@
     "mongoose": "^5.9.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^8.3.8",
+    "@types/mongoose": "^5.7.6",
     "get-graphql-schema": "^2.1.2",
     "graphql-cli": "^3.0.14",
     "nodemon": "^2.0.2"

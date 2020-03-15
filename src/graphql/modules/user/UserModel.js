@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { GraphQLID } = require('graphql');
 
 const Schema = mongoose.Schema;
 
