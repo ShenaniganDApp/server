@@ -28,29 +28,9 @@ export type Loaders = {
 export const { nodeField, nodeInterface } = nodeDefinitions(
   async (globalId, context: GraphQLContext) => {
     const { type, id } = fromGlobalId(globalId);
-    if (type === 'User') {
-      var user = await UserModel.findById(id);
-      user = transformUser(user);
-      return user;
-    }
-    if (type === 'Wager') {
-      var wager = await WagerModel.findById(id);
-      wager = transformWager(wager);
-      return wager;
-    }
-    // if (type === 'Bet') {
-    //   var bet = await BetModel.findById(id);
-    //   bet = transformBet(bet);
-    //   return bet;
-    // }
-    // if (type === 'Comment') {
-    //   var comment = await CommentModel.findById(id);
-    //   comment = transformBet(comment);
-    //   return comment;
-    // }
-    // const loader: Loader = (loaders as Loaders)[`${type}Loader`];
-    // console.log(loader)
-    // return (loader && loader.load(context, id)) || null;
+    const loader: Loader = (loaders as Loaders)[`${type}Loader`];
+    console.log(loader)
+    return (loader && loader.load(context, id)) || null;
   },
   object => registeredTypes[object.constructor.name] || null
 );

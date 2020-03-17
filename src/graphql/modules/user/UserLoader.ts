@@ -44,18 +44,19 @@ const viewerCanSee = () => true;
 
 export const load = async (
   context: GraphQLContext,
-  id: string | Object | ObjectId
+  _id: string | Object | ObjectId
 ): Promise<User | null> => {
-  if (!id && typeof id !== 'string') {
+  if (!_id && typeof _id !== 'string') {
     return null;
   }
 
   let data;
   try {
-    data = await context.dataloaders.UserLoader.load(id as string);
+    data = await context.dataloaders.UserLoader.load(_id as string);
   } catch (err) {
     return null;
   }
+
   return viewerCanSee() ? new User(data, context) : null;
 };
 
@@ -83,14 +84,14 @@ export const loadUsers = async (context: GraphQLContext, args: UserArgs) => {
   const where = args.search
     ? { name: { $regex: new RegExp(`^${args.search}`, 'ig') } }
     : {};
-  const users = await UserModel.find(where, {});
-  return connectionFromArray(users, args)
-  // return connectionFromMongoCursor({
-  //   cursor: users,
-  //   context,
-  //   args,
-  //   loader: load
-  // });
+  const users = UserModel.find(where, {});
+  // return connectionFromArray(users, args)
+  return connectionFromMongoCursor({
+    cursor: users,
+    context,
+    args,
+    loader: load
+  });
 };
 
 export const loadCreator = async (

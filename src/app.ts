@@ -5,6 +5,8 @@ import graphqlHttp from 'express-graphql';
 import mongoose from 'mongoose';
 import {schema as graphqlSchema} from './graphql/schema/index';
 import isAuth from './middleware/is-auth';
+import * as loaders from './graphql/loaders';
+import { Loaders } from './graphql/nodeInterface';
 // import { SubscriptionServer } from 'subscriptions-transport-ws');
 const app = express();
 
@@ -30,13 +32,24 @@ const graphqlSettingsPerReq = async req => {
   const user = req.user;
   const isAuth = req.isAuth
 
+  const AllLoaders: Loaders = loaders;
+
+  const dataloaders = Object.keys(AllLoaders).reduce(
+    (acc, loaderKey) => ({
+      ...acc,
+      [loaderKey]: AllLoaders[loaderKey].getLoader(),
+    }),
+    {},
+  );
+
   return {
     graphiql: true,
     schema: graphqlSchema,
     context: {
       user,
       isAuth,
-      req
+      req,
+      dataloaders
     },
     // extensions: ({ document, variables, operationName, result }) => {
     // console.log(print(document));

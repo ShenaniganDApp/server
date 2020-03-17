@@ -14,6 +14,8 @@ import { IUser } from '../user/UserModel';
 import { GraphQLContext } from '../../TypeDefinition';
 
 export default class Wager {
+  id: string;
+
   _id: Types.ObjectId;
 
   title: string;
@@ -39,15 +41,15 @@ const viewerCanSee = () => true;
 
 export const load = async (
   context: GraphQLContext,
-  id: string | Object | ObjectId
+  _id: string | Object | ObjectId
 ): Promise<Wager | null> => {
-  if (!id && typeof id !== 'string') {
+  if (!_id && typeof _id !== 'string') {
     return null;
   }
 
   let data;
   try {
-    data = await context.dataloaders.WagerLoader.load(id as string);
+    data = await context.dataloaders.WagerLoader.load(_id as string);
   } catch (err) {
     return null;
   }
@@ -56,20 +58,20 @@ export const load = async (
 
 export const clearCache = (
   { dataloaders }: GraphQLContext,
-  id: Types.ObjectId
-) => dataloaders.WagerLoader.clear(id.toString());
+  _id: Types.ObjectId
+) => dataloaders.WagerLoader.clear(_id.toString());
 
 export const primeCache = (
   { dataloaders }: GraphQLContext,
-  id: Types.ObjectId,
+  _id: Types.ObjectId,
   data: IWager
-) => dataloaders.WagerLoader.prime(id.toString(), data);
+) => dataloaders.WagerLoader.prime(_id.toString(), data);
 
 export const clearAndPrimeCache = (
   context: GraphQLContext,
-  id: Types.ObjectId,
+  _id: Types.ObjectId,
   data: IWager
-) => clearCache(context, id) && primeCache(context, id, data);
+) => clearCache(context, _id) && primeCache(context, _id, data);
 
 type WagerArgs = ConnectionArguments & {
   search?: string;
@@ -78,14 +80,13 @@ export const loadWagers = async (context: GraphQLContext, args: WagerArgs) => {
   const where = args.search
     ? { title: { $regex: new RegExp(`^${args.search}`, 'ig') } }
     : {};
-  const wagers = await WagerModel.find(where, {})
-  return connectionFromArray(wagers, args);
-  // return connectionFromMongoCursor({
-  //   cursor: wagers,
-  //   context,
-  //   args,
-  //   loader: load
-  // });
+  const wagers = WagerModel.find(where, {});
+  return connectionFromMongoCursor({
+    cursor: wagers,
+    context,
+    args,
+    loader: load
+  });
 };
 
 export const loadUserWagers = async (
@@ -98,12 +99,11 @@ export const loadUserWagers = async (
     ? { title: { $regex: new RegExp(`^${args.search}`, 'ig') } }
     : {};
 
-  const wagers = await WagerModel.find(where, { creator: user._id })
-  return connectionFromArray(wagers,args)
-  // return connectionFromMongoCursor({
-  //   cursor: wagers,
-  //   context,
-  //   args,
-  //   loader: load
-  // });
+  const wagers = WagerModel.find(where, { creator: user._id });
+  return connectionFromMongoCursor({
+    cursor: wagers,
+    context,
+    args,
+    loader: load
+  });
 };
